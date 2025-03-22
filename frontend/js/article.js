@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const API_BASE = "https://info-eye.onrender.com";
     const articleContainer = document.getElementById("articleContainer");
     const urlParams = new URLSearchParams(window.location.search);
     const articleId = urlParams.get("id");
@@ -9,19 +10,41 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h2>${article.title}</h2>
                 <p><strong>التصنيف:</strong> ${article.category}</p>
                 <p>${article.content}</p>
+                <p>⭐ ${article.rating?.toFixed(1) || "0"} من 5 (${article.ratingCount || 0} تقييم)</p>
+                <div id="ratingStars">
+                    <p>قيّم هذا المقال:</p>
+                    ${[1, 2, 3, 4, 5].map(star => `<span data-star="${star}" style="cursor:pointer;font-size:24px;">⭐</span>`).join('')}
+                </div>
                 <div class="share-buttons">
                     <button onclick="shareArticle('facebook')">مشاركة على فيسبوك</button>
                     <button onclick="shareArticle('twitter')">مشاركة على تويتر</button>
                     <button onclick="shareArticle('linkedin')">مشاركة على لينكدإن</button>
                 </div>
             `;
+
+            document.querySelectorAll("#ratingStars span").forEach(star => {
+                star.addEventListener("click", () => {
+                    const ratingValue = parseInt(star.getAttribute("data-star"));
+                    fetch(`${API_BASE}/articles/${articleId}/rate`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ rating: ratingValue })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            alert(data.message);
+                            location.reload();
+                        })
+                        .catch(() => alert("❌ حدث خطأ أثناء إرسال التقييم"));
+                });
+            });
         } else {
             articleContainer.innerHTML = "<p>❌ لم يتم العثور على المقال.</p>";
         }
     }
 
     function fetchArticleFromServer() {
-        fetch(`http://localhost:3000/articles/${articleId}`)
+        fetch(`${API_BASE}/articles/${articleId}`)
             .then(res => {
                 if (!res.ok) throw new Error("Not Found");
                 return res.json();
@@ -52,119 +75,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
     fetchArticleFromServer();
 });
-
-
-// ✅ الجزء الخلفي: server.js - إضافة نموذج التعليق ونقاط النهاية
-
-const CommentSchema = new mongoose.Schema({
-    articleId: { type: mongoose.Schema.Types.ObjectId, ref: "Article", required: true },
-    username: String,
-    text: String,
-    createdAt: { type: Date, default: Date.now }
-});
-const Comment = mongoose.model("Comment", CommentSchema);
-
-// 🟢 نقطة لإضافة تعليق على مقال معين
-app.post("/articles/:id/comments", async (req, res) => {
-    const { username, text } = req.body;
-    try {
-        const comment = new Comment({
-            articleId: req.params.id,
-            username,
-            text
-        });
-        await comment.save();
-        res.status(201).json(comment);
-    } catch (error) {
-        res.status(500).json({ message: "فشل في إضافة التعليق" });
-    }
-});
-
-// 🟢 نقطة لجلب التعليقات لمقال معين
-app.get("/articles/:id/comments", async (req, res) => {
-    try {
-        const comments = await Comment.find({ articleId: req.params.id }).sort({ createdAt: -1 });
-        res.json(comments);
-    } catch (error) {
-        res.status(500).json({ message: "فشل في جلب التعليقات" });
-    }
-});
-
-// 🔄 تحديث article.js لإضافة نظام التعليقات
-
-document.addEventListener("DOMContentLoaded", function () {
-    const articleContainer = document.getElementById("articleContainer");
-    const commentsContainer = document.getElementById("commentsContainer");
-    const commentForm = document.getElementById("commentForm");
-    const commentInput = document.getElementById("commentText");
-    const urlParams = new URLSearchParams(window.location.search);
-    const articleId = urlParams.get("id");
-
-    function renderArticle(article) {
-        articleContainer.innerHTML = `
-            <h2>${article.title}</h2>
-            <p><strong>التصنيف:</strong> ${article.category}</p>
-            <p>${article.content}</p>
-        `;
-    }
-
-    function renderComments(comments) {
-        commentsContainer.innerHTML = "";
-        if (comments.length === 0) {
-            commentsContainer.innerHTML = "<p>لا توجد تعليقات بعد.</p>";
-            return;
-        }
-        comments.forEach(comment => {
-            const div = document.createElement("div");
-            div.className = "comment";
-            div.innerHTML = `
-                <p><strong>${comment.author}</strong>:</p>
-                <p>${comment.text}</p>
-            `;
-            commentsContainer.appendChild(div);
-        });
-    }
-
-    function fetchArticleAndComments() {
-        fetch(`http://localhost:3000/articles/${articleId}`)
-            .then(res => res.json())
-            .then(data => {
-                renderArticle(data);
-                fetchComments();
-            })
-            .catch(() => {
-                articleContainer.innerHTML = "<p>❌ فشل في تحميل المقال.</p>";
-            });
-    }
-
-    function fetchComments() {
-        fetch(`http://localhost:3000/articles/${articleId}/comments`)
-            .then(res => res.json())
-            .then(data => renderComments(data))
-            .catch(() => {
-                commentsContainer.innerHTML = "<p>❌ فشل في تحميل التعليقات.</p>";
-            });
-    }
-
-    commentForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const commentText = commentInput.value.trim();
-        if (!commentText) return;
-
-        fetch(`http://localhost:3000/articles/${articleId}/comments`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ author: "زائر مجهول", text: commentText })
-        })
-            .then(res => res.json())
-            .then(() => {
-                commentInput.value = "";
-                fetchComments();
-            });
-    });
-
-    fetchArticleAndComments();
-});
-const API_BASE = "https://info-eye.onrender.com"; // استبدل هذا بالرابط الفعلي لمشروعك
-
-fetch(`${API_BASE}/articles`)

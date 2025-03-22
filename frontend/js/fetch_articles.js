@@ -1,3 +1,4 @@
+const API_BASE = "https://info-eye.onrender.com";
 document.addEventListener("DOMContentLoaded", function () {
     const articlesContainer = document.getElementById("articles");
     const loader = document.createElement("div");

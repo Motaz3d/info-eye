@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const ctx = document.getElementById("chartCanvas").getContext("2d");
+    const API_BASE = "https://info-eye.onrender.com";
 
     fetch("http://localhost:3000/stats/articles")
         .then(res => res.json())

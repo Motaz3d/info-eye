@@ -1,4 +1,4 @@
-// comments.js
+const API_BASE = "https://info-eye.onrender.com";
 
 const urlParams = new URLSearchParams(window.location.search);
 const articleId = urlParams.get("id");
@@ -32,7 +32,7 @@ function renderComments(comments) {
 }
 
 function fetchComments() {
-  fetch(`http://localhost:3000/articles/${articleId}/comments`)
+  fetch(`${API_BASE}/articles/${articleId}/comments`)
     .then(res => res.json())
     .then(data => renderComments(data))
     .catch(() => {
@@ -48,7 +48,7 @@ commentForm.addEventListener("submit", function (e) {
     text: commentText.value,
   };
 
-  fetch(`http://localhost:3000/articles/${articleId}/comments`, {
+  fetch(`${API_BASE}/articles/${articleId}/comments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,6 +68,3 @@ commentForm.addEventListener("submit", function (e) {
 
 // تحميل التعليقات عند بدء الصفحة
 fetchComments();
-const API_BASE = "https://info-eye.onrender.com"; // استبدل هذا بالرابط الفعلي لمشروعك
-
-fetch(`${API_BASE}/articles`)

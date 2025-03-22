@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const articlesContainer = document.getElementById("articlesContainer");
     const searchInput = document.getElementById("searchInput");
+    const API_BASE = "https://info-eye.onrender.com";
   
     const loadMoreTrigger = document.createElement("div");
     loadMoreTrigger.id = "loadMoreTrigger";

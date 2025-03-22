@@ -1,3 +1,4 @@
+const API_BASE = "https://info-eye.onrender.com";
 document.addEventListener("DOMContentLoaded", function () {
     const toggleButton = document.getElementById("darkModeToggle");
     const body = document.body;

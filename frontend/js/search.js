@@ -1,3 +1,5 @@
+const API_BASE = "https://info-eye.onrender.com";
+
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("searchInput");
     const searchResults = document.getElementById("articlesContainer"); // نستخدم نفس الحاوية

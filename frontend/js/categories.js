@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const titleElement = document.getElementById("category-title");
     const articlesContainer = document.getElementById("category-articles");
     const searchInput = document.getElementById("searchInput");
+    const API_BASE = "https://info-eye.onrender.com";
   
     let allArticles = [];
   
@@ -60,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem("favorites", JSON.stringify(favs));
     }
   
-    fetch("http://localhost:3000/articles")
+    fetch("https://info-eye.onrender.com/articles")
       .then(res => res.json())
       .then(data => {
         allArticles = data.filter(article => article.category === category);

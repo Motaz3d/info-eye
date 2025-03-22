@@ -1,5 +1,5 @@
 // favorites.js
-
+const API_BASE = "https://info-eye.onrender.com";
 document.addEventListener("DOMContentLoaded", function () {
   const container = document.getElementById("favoritesContainer");
   const favs = JSON.parse(localStorage.getItem("favorites") || "[]");

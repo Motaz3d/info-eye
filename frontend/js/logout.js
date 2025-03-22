@@ -1,3 +1,5 @@
+const API_BASE = "https://info-eye.onrender.com";
+
 document.addEventListener("DOMContentLoaded", function () {
     const logoutButton = document.getElementById("logoutButton");
 

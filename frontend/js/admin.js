@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const articleTitle = document.getElementById("articleTitle");
     const articleCategory = document.getElementById("articleCategory");
     const articleContent = document.getElementById("articleContent");
+    const API_BASE = "https://info-eye.onrender.com";
 
     let articles = JSON.parse(localStorage.getItem("articles")) || [
         { id: 1, title: "Future of Renewable Energy", category: "Industry", content: "An in-depth look at renewable energy." },
