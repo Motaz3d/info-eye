@@ -1,28 +1,27 @@
-// favorites.js
-const API_BASE = "https://info-eye.onrender.com";
 document.addEventListener("DOMContentLoaded", function () {
-  const container = document.getElementById("favoritesContainer");
+  const API_BASE = "https://info-eye.onrender.com";
+  const favoritesContainer = document.getElementById("favoritesContainer");
+
   const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
 
   if (favs.length === 0) {
-    container.innerHTML = "<p>❌ لا توجد مقالات مفضلة.</p>";
+    favoritesContainer.innerHTML = "<p>❌ لا توجد مقالات محفوظة في المفضلة.</p>";
     return;
   }
 
-  fetch("http://localhost:3000/articles")
+  fetch(`${API_BASE}/articles`)
     .then(res => res.json())
     .then(data => {
-      const favArticles = data.filter(article => favs.includes(article._id));
+      const filtered = data.filter(article => favs.includes(article._id));
 
-      if (favArticles.length === 0) {
-        container.innerHTML = "<p>❌ لم يتم العثور على مقالات مطابقة في قاعدة البيانات.</p>";
+      if (filtered.length === 0) {
+        favoritesContainer.innerHTML = "<p>❌ لم يتم العثور على مقالات محفوظة.</p>";
         return;
       }
 
-      favArticles.forEach(article => {
+      filtered.forEach(article => {
         const articleElement = document.createElement("div");
         articleElement.classList.add("article");
-
         articleElement.innerHTML = `
           <h3><a href="article.html?id=${article._id}">${article.title}</a></h3>
           <p><strong>التصنيف:</strong> ${article.category}</p>
@@ -31,20 +30,16 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
         articleElement.querySelector(".remove-fav").addEventListener("click", function () {
-          removeFromFavorites(article._id);
+          let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+          favs = favs.filter(id => id !== article._id);
+          localStorage.setItem("favorites", JSON.stringify(favs));
+          location.reload();
         });
 
-        container.appendChild(articleElement);
+        favoritesContainer.appendChild(articleElement);
       });
     })
     .catch(() => {
-      container.innerHTML = "<p>❌ فشل في تحميل المقالات.</p>";
+      favoritesContainer.innerHTML = "<p>❌ فشل في تحميل المقالات.</p>";
     });
-
-  function removeFromFavorites(id) {
-    let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-    favs = favs.filter(favId => favId !== id);
-    localStorage.setItem("favorites", JSON.stringify(favs));
-    location.reload(); // إعادة تحميل الصفحة لتحديث القائمة
-  }
 });
