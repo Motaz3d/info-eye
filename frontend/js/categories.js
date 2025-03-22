@@ -76,3 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
   });
+
+  const API_BASE = "https://info-eye.onrender.com"; // استبدل هذا بالرابط الفعلي لمشروعك
+
+fetch(`${API_BASE}/articles`)
