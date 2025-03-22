@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <!-- خط عربي من Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>لوحة تحكم عين المعلومات</h1>
+    <button id="darkModeToggle">تبديل الوضع الليلي</button>
+    <button id="logoutButton">تسجيل الخروج</button>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="categories.html">التصنيفات</a></li>
+      <li><a href="favorites.html">📌 المفضلة</a></li>
+      <li><a href="admin.html">لوحة التحكم</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h2>إدارة المقالات</h2>
+    <button id="addArticle">إضافة مقال جديد</button>
+
+    <select id="filterCategory">
+      <option value="all">كل التصنيفات</option>
+      <option value="Industry">الصناعة</option>
+      <option value="Marketing">التسويق</option>
+      <option value="Agriculture">الزراعة</option>
+    </select>
+
+      <h3>📈 المقالات حسب الأشهر</h3>
+      <canvas id="monthlyChart" height="200"></canvas>
+    </section>
+    <div id="articlesAdmin"></div>
+
+    <!-- التحليل البياني -->
+    <section id="chartContainer" style="margin-top: 40px;">
+      <section id="monthlyChartContainer" style="margin-top: 40px;">
+      <h3>📊 تحليل المقالات</h3>
+      <canvas id="chartCanvas" height="200"></canvas>
+    </section>
+
+    <!-- الاقتراحات -->
+    <section id="suggestionsBox" style="margin-top: 30px; background: #f8f8f8; padding: 15px; border-radius: 10px;">
+      <!-- سيتم إدراج الاقتراحات هنا -->
+    </section>
+  </main>
+
+  <!-- نافذة المقال -->
+  <div id="articleModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal">&times;</span>
+      <h2>إضافة/تعديل مقال</h2>
+      <form id="articleForm">
+        <label for="articleTitle">العنوان:</label>
+        <input type="text" id="articleTitle" required />
+
+        <label for="articleCategory">التصنيف:</label>
+        <select id="articleCategory" required>
+          <option value="Industry">الصناعة</option>
+          <option value="Marketing">التسويق</option>
+          <option value="Agriculture">الزراعة</option>
+        </select>
+
+        <label for="articleContent">المحتوى:</label>
+        <textarea id="articleContent" required></textarea>
+
+        <button type="submit">حفظ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- روابط الجافاسكربت -->
+  <script src="../js/darkmode.js"></script>
+  <script src="../js/logout.js"></script>
+  <script src="../js/admin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/analytics.js"></script>
+</body>
+</html>

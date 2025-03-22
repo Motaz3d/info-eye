@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تفاصيل المقال</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header>
+    <h1>عين المعلومات</h1>
+    <button id="darkModeToggle">تبديل الوضع الليلي</button>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="categories.html">التصنيفات</a></li>
+      <li><a href="favorites.html">📌 المفضلة</a></li>
+      <li><a href="admin.html">لوحة التحكم</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <article id="articleContainer">
+      <!-- سيتم عرض المقال هنا من js -->
+    </article>
+
+    <!-- ✅ قسم التعليقات -->
+    <section id="comments" style="margin-top: 40px;">
+      <h3>💬 التعليقات</h3>
+      <div id="commentsList"></div>
+
+      <form id="commentForm" style="margin-top: 20px;">
+        <input type="text" id="commentAuthor" placeholder="اسمك" required style="width: 100%; padding: 8px;" />
+        <textarea id="commentText" placeholder="اكتب تعليقك..." required style="width: 100%; padding: 8px; margin-top: 10px;"></textarea>
+        <button type="submit" style="margin-top: 10px;">إرسال التعليق</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- ✅ السكريبتات -->
+  <script src="../js/darkmode.js"></script>
+  <script src="../js/article.js"></script>
+  <script src="../js/comments.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التصنيفات</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- خط عربي من Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>عين المعلومات</h1>
+    <button id="darkModeToggle">تبديل الوضع الليلي</button>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="categories.html">التصنيفات</a></li>
+      <li><a href="favorites.html">📌 المفضلة</a></li>
+      <li><a href="admin.html">لوحة التحكم</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <!-- ✅ روابط تصنيفات سريعة -->
+    <section id="quick-categories" style="margin-bottom: 20px;">
+      <h3>📂 اختر تصنيف:</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li><a href="categories.html?category=Industry">🏭 الصناعة</a></li>
+        <li><a href="categories.html?category=Marketing">📈 التسويق</a></li>
+        <li><a href="categories.html?category=Agriculture">🌾 الزراعة</a></li>
+      </ul>
+    </section>
+
+    <!-- ✅ عنوان التصنيف -->
+    <h2 id="category-title">التصنيف</h2>
+
+    <!-- ✅ حقل بحث داخل التصنيف -->
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="ابحث داخل هذا التصنيف..."
+      style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px;"
+    />
+
+    <!-- ✅ المقالات -->
+    <div id="category-articles">
+      <!-- سيتم تحميل المقالات هنا ديناميكيًا -->
+    </div>
+  </main>
+
+  <!-- ✅ السكريبتات -->
+  <script src="js/darkmode.js"></script>
+  <script src="js/categories.js"></script>
+</body>
+</html>

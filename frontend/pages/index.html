@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>عين المعلومات - الصفحة الرئيسية</title>
+
+  <!-- الأيقونات -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
+  <link rel="manifest" href="../assets/site.webmanifest">
+
+  <!-- ستايل -->
+  <link rel="stylesheet" href="../css/styles.css" />
+  <!-- خط عربي من Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>عين المعلومات</h1>
+    <button id="darkModeToggle">تبديل الوضع الليلي</button>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="categories.html">التصنيفات</a></li>
+      <li><a href="favorites.html">📌 المفضلة</a></li>
+      <li><a href="admin.html">لوحة التحكم</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h2>أحدث المقالات</h2>
+  
+    <!-- روابط التصنيفات السريعة -->
+    <section id="quick-categories" style="margin-bottom: 20px;">
+      <h3>🔍 تصفح حسب التصنيف:</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li><a href="categories.html?category=Industry">🏭 الصناعة</a></li>
+        <li><a href="categories.html?category=Marketing">📈 التسويق</a></li>
+        <li><a href="categories.html?category=Agriculture">🌾 الزراعة</a></li>
+      </ul>
+    </section>
+  
+    <!-- حقل البحث -->
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="ابحث عن مقال..."
+      style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px;"
+    />
+  
+    <div id="articlesContainer">
+      <!-- سيتم تحميل المقالات هنا ديناميكيًا -->
+    </div>
+  
+    <button id="loadMore" style="display: none;">تحميل المزيد</button>
+  </main>
+
+  <!-- سكريبتات -->
+  <script src="../js/darkmode.js"></script>
+  <script src="../js/index.js"></script>
+</body>
+</html>
