@@ -28,21 +28,21 @@ const User = mongoose.model("User", UserSchema);
 
 // نموذج المقالات
 const ArticleSchema = new mongoose.Schema({
-    title: String,
-    category: String,
-    content: String,
-    author: String,
-    createdAt: { type: Date, default: Date.now },
-    rating: { type: Number, default: 0 },
-    ratingCount: { type: Number, default: 0 },
-    comments: [
-      {
-        commentId: String,
-        author: String,
-        text: String,
-        createdAt: { type: Date, default: Date.now }
-      }
-    ]
+  title: String,
+  category: String,
+  content: String,
+  author: String,
+  createdAt: { type: Date, default: Date.now },
+  rating: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
+  comments: [
+    {
+      commentId: String,
+      author: String,
+      text: String,
+      createdAt: { type: Date, default: Date.now }
+    }
+  ]
 });
 const Article = mongoose.model("Article", ArticleSchema);
 
