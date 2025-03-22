@@ -34,7 +34,15 @@ const ArticleSchema = new mongoose.Schema({
     author: String,
     createdAt: { type: Date, default: Date.now },
     rating: { type: Number, default: 0 },
-    ratingCount: { type: Number, default: 0 }
+    ratingCount: { type: Number, default: 0 },
+    comments: [
+      {
+        commentId: String,
+        author: String,
+        text: String,
+        createdAt: { type: Date, default: Date.now }
+      }
+    ]
 });
 const Article = mongoose.model("Article", ArticleSchema);
 
@@ -174,29 +182,8 @@ app.get("/stats/monthly", async (req, res) => {
     }
 });
 
-// تشغيل الخادم
-app.listen(PORT, () => {
-    console.log(`✅ Server is running on http://localhost:${PORT}`);
-});
-
-const ArticleSchema = new mongoose.Schema({
-    title: String,
-    category: String,
-    content: String,
-    author: String,
-    createdAt: { type: Date, default: Date.now },
-    rating: { type: Number, default: 0 },
-    ratingCount: { type: Number, default: 0 },
-    comments: [
-      {
-        author: String,
-        text: String,
-        createdAt: { type: Date, default: Date.now }
-      }
-    ]
-  });
-
-  app.get("/articles/:id/comments", async (req, res) => {
+// ✅ نقطة نهاية لجلب التعليقات
+app.get("/articles/:id/comments", async (req, res) => {
     try {
       const article = await Article.findById(req.params.id);
       if (!article) return res.status(404).json({ message: "❌ لم يتم العثور على المقال" });
@@ -204,137 +191,46 @@ const ArticleSchema = new mongoose.Schema({
     } catch (error) {
       res.status(500).json({ message: "❌ خطأ في جلب التعليقات" });
     }
-  });
+});
 
-  app.post("/articles/:id/comments", async (req, res) => {
-    const { author, text } = req.body;
-  
-    if (!author || !text) {
-      return res.status(400).json({ message: "❌ الاسم والنص مطلوبان" });
+// ✅ نقطة نهاية لإضافة تعليق
+app.post("/articles/:id/comments", async (req, res) => {
+    const { author, text, commentId } = req.body;
+
+    if (!author || !text || !commentId) {
+      return res.status(400).json({ message: "❌ الاسم والنص ومعرف التعليق مطلوبون" });
     }
-  
+
     try {
       const article = await Article.findById(req.params.id);
       if (!article) return res.status(404).json({ message: "❌ لم يتم العثور على المقال" });
-  
-      article.comments.push({ author, text });
+
+      article.comments.push({ commentId, author, text });
       await article.save();
-  
+
       res.json({ message: "✅ تم إضافة التعليق بنجاح" });
     } catch (error) {
       res.status(500).json({ message: "❌ خطأ أثناء حفظ التعليق" });
     }
-  });
+});
 
-  // ✅ في server.js
-
-// تعديل ArticleSchema ليشمل commentId
-const ArticleSchema = new mongoose.Schema({
-    title: String,
-    category: String,
-    content: String,
-    author: String,
-    createdAt: { type: Date, default: Date.now },
-    rating: { type: Number, default: 0 },
-    ratingCount: { type: Number, default: 0 },
-    comments: [
-      {
-        commentId: String, // نستخدم UUID أو توليد عشوائي من الواجهة
-        author: String,
-        text: String,
-        createdAt: { type: Date, default: Date.now }
-      }
-    ]
-  });
-  
-  // ✅ حذف تعليق من المقال
-  app.delete("/articles/:id/comments/:commentId", async (req, res) => {
+// ✅ نقطة نهاية لحذف تعليق
+app.delete("/articles/:id/comments/:commentId", async (req, res) => {
     try {
       const { id, commentId } = req.params;
       const article = await Article.findById(id);
       if (!article) return res.status(404).json({ message: "❌ المقال غير موجود" });
-  
-      const newComments = article.comments.filter(comment => comment.commentId !== commentId);
-      article.comments = newComments;
+
+      article.comments = article.comments.filter(comment => comment.commentId !== commentId);
       await article.save();
-  
+
       res.json({ message: "✅ تم حذف التعليق بنجاح" });
     } catch (error) {
       res.status(500).json({ message: "❌ فشل في حذف التعليق" });
     }
-  });
-  
-  
-  // ✅ في comments.js
-  function generateId() {
-    return '_' + Math.random().toString(36).substr(2, 9);
-  }
-  
-  function renderComments(comments) {
-    commentsList.innerHTML = "";
-    if (comments.length === 0) {
-      commentsList.innerHTML = "<p>لا توجد تعليقات بعد.</p>";
-      return;
-    }
-  
-    const localComments = JSON.parse(localStorage.getItem("myComments") || "[]");
-  
-    comments.forEach(comment => {
-      const commentElement = document.createElement("div");
-      commentElement.classList.add("comment");
-      commentElement.style.borderBottom = "1px solid #ccc";
-      commentElement.style.marginBottom = "10px";
-      commentElement.style.paddingBottom = "10px";
-  
-      commentElement.innerHTML = `
-        <p><strong>${comment.author}</strong></p>
-        <p>${comment.text}</p>
-      `;
-  
-      if (localComments.includes(comment.commentId)) {
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "🗑️ حذف";
-        deleteBtn.style.marginTop = "5px";
-        deleteBtn.onclick = () => {
-          fetch(`http://localhost:3000/articles/${articleId}/comments/${comment.commentId}`, {
-            method: "DELETE"
-          })
-            .then(res => res.json())
-            .then(() => {
-              fetchComments();
-            })
-            .catch(() => alert("❌ فشل في حذف التعليق"));
-        };
-        commentElement.appendChild(deleteBtn);
-      }
-  
-      commentsList.appendChild(commentElement);
-    });
-  }
-  
-  commentForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const newComment = {
-      author: commentAuthor.value,
-      text: commentText.value,
-      commentId: generateId()
-    };
-  
-    fetch(`http://localhost:3000/articles/${articleId}/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newComment)
-    })
-      .then(res => res.json())
-      .then(() => {
-        let saved = JSON.parse(localStorage.getItem("myComments") || "[]");
-        saved.push(newComment.commentId);
-        localStorage.setItem("myComments", JSON.stringify(saved));
-  
-        commentAuthor.value = "";
-        commentText.value = "";
-        fetchComments();
-      })
-      .catch(() => alert("❌ حدث خطأ أثناء إرسال التعليق."));
-  });
-  
+});
+
+// تشغيل الخادم
+app.listen(PORT, () => {
+    console.log(`✅ Server is running on http://localhost:${PORT}`);
+});
