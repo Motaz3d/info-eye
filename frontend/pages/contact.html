@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>اتصل بنا | عين المعلومات</title>
+  <meta name="description" content="تواصل مع فريق عين المعلومات لأي استفسار أو اقتراح.">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>اتصل بنا</h1>
+    <button id="darkModeToggle">تبديل الوضع الليلي</button>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html">الرئيسية</a></li>
+      <li><a href="categories.html">التصنيفات</a></li>
+      <li><a href="favorites.html">📌 المفضلة</a></li>
+      <li><a href="admin.html">لوحة التحكم</a></li>
+      <li><a href="about.html">من نحن</a></li>
+      <li><a href="contact.html">اتصل بنا</a></li>
+    </ul>
+  </nav>
+
+  <main style="max-width: 800px; margin: auto; padding: 20px;">
+    <h2>تواصل معنا</h2>
+    <p>هل لديك اقتراح، استفسار، أو فكرة تطوير؟ يسعدنا سماعك!</p>
+
+    <form id="contactForm">
+      <label for="name">الاسم:</label>
+      <input type="text" id="name" required />
+
+      <label for="email">البريد الإلكتروني:</label>
+      <input type="email" id="email" required />
+
+      <label for="message">الرسالة:</label>
+      <textarea id="message" required></textarea>
+
+      <button type="submit">إرسال</button>
+    </form>
+
+    <p style="margin-top: 20px;">📧 يمكنك أيضًا التواصل عبر البريد: <a href="mailto:info@info-eye.com">info@info-eye.com</a></p>
+  </main>
+
+  <script src="../js/darkmode.js"></script>
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      alert("✅ تم إرسال رسالتك بنجاح (نموذج تجريبي فقط).");
+      this.reset();
+    });
+  </script>
+</body>
+</html>

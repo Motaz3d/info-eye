@@ -18,28 +18,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const articleContent = document.getElementById("articleContent");
     const API_BASE = "https://info-eye.onrender.com";
 
-    let articles = JSON.parse(localStorage.getItem("articles")) || [
-        { id: 1, title: "Future of Renewable Energy", category: "Industry", content: "An in-depth look at renewable energy." },
-        { id: 2, title: "AI in Marketing Strategies", category: "Marketing", content: "How AI is transforming marketing strategies." },
-        { id: 3, title: "Breakthroughs in Agricultural Tech", category: "Agriculture", content: "The latest advancements in agricultural technology." }
-    ];
-
-    function saveArticles() {
-        localStorage.setItem("articles", JSON.stringify(articles));
-    }
+    let articles = [];
 
     function renderArticles(categoryFilter = "all", searchQuery = "") {
         articlesContainer.innerHTML = "";
         articles.forEach(article => {
             if ((categoryFilter === "all" || article.category === categoryFilter) &&
                 (searchQuery === "" || article.title.toLowerCase().includes(searchQuery.toLowerCase()))) {
+
+                const commentsCount = article.comments ? article.comments.length : 0;
+
                 const articleElement = document.createElement("div");
                 articleElement.classList.add("article");
                 articleElement.innerHTML = `
                     <h3>${article.title}</h3>
                     <p><strong>التصنيف:</strong> ${article.category}</p>
-                    <button class="editArticle" data-id="${article.id}">تعديل</button>
-                    <button class="deleteArticle" data-id="${article.id}">حذف</button>
+                    <p><strong>عدد التعليقات:</strong> 💬 ${commentsCount}</p>
+                    <button class="editArticle" data-id="${article._id}">تعديل</button>
+                    <button class="deleteArticle" data-id="${article._id}">حذف</button>
+                    <button class="viewComments" data-id="${article._id}">عرض التعليقات</button>
                 `;
                 articlesContainer.appendChild(articleElement);
             }
@@ -47,21 +44,62 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.querySelectorAll(".editArticle").forEach(button => {
             button.addEventListener("click", function () {
-                const articleId = parseInt(this.getAttribute("data-id"));
+                const articleId = this.getAttribute("data-id");
                 editArticle(articleId);
             });
         });
 
         document.querySelectorAll(".deleteArticle").forEach(button => {
             button.addEventListener("click", function () {
-                const articleId = parseInt(this.getAttribute("data-id"));
+                const articleId = this.getAttribute("data-id");
                 deleteArticle(articleId);
+            });
+        });
+
+        document.querySelectorAll(".viewComments").forEach(button => {
+            button.addEventListener("click", function () {
+                const articleId = this.getAttribute("data-id");
+                fetch(`${API_BASE}/articles/${articleId}/comments`)
+                    .then(res => res.json())
+                    .then(comments => {
+                        if (comments.length === 0) {
+                            alert("لا توجد تعليقات على هذا المقال.");
+                            return;
+                        }
+                        let output = "🗨️ التعليقات:\n\n";
+                        comments.forEach(comment => {
+                            output += `👤 ${comment.author}\n📝 ${comment.text}\n🗑️ ID: ${comment.commentId}\n\n`;
+                        });
+                        const toDelete = prompt(output + "\n\nاكتب ID التعليق الذي تريد حذفه (أو اتركه فارغًا للإلغاء):");
+                        if (toDelete) {
+                            fetch(`${API_BASE}/articles/${articleId}/comments/${toDelete}`, {
+                                method: "DELETE"
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    alert(data.message);
+                                    fetchArticles();
+                                });
+                        }
+                    });
             });
         });
     }
 
+    function fetchArticles() {
+        fetch(`${API_BASE}/articles`)
+            .then(res => res.json())
+            .then(data => {
+                articles = data;
+                renderArticles();
+            })
+            .catch(() => {
+                articlesContainer.innerHTML = "<p>❌ فشل في تحميل المقالات.</p>";
+            });
+    }
+
     function fetchSuggestions() {
-        fetch("http://localhost:3000/suggestions")
+        fetch(`${API_BASE}/suggestions`)
             .then(res => res.json())
             .then(data => {
                 suggestionsContainer.innerHTML = "<h3>🧠 اقتراحات المواضيع:</h3>";
@@ -94,16 +132,8 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    function addArticle(title, category, content) {
-        if (!validateInput(title, category, content)) return;
-        const newArticle = { id: articles.length + 1, title, category, content };
-        articles.push(newArticle);
-        saveArticles();
-        renderArticles(filterCategory.value, searchInput.value);
-    }
-
     function editArticle(id) {
-        const article = articles.find(a => a.id === id);
+        const article = articles.find(a => a._id === id);
         if (article) {
             articleTitle.value = article.title;
             articleCategory.value = article.category;
@@ -113,21 +143,31 @@ document.addEventListener("DOMContentLoaded", function () {
             articleForm.onsubmit = function (event) {
                 event.preventDefault();
                 if (!validateInput(articleTitle.value, articleCategory.value, articleContent.value)) return;
-                article.title = articleTitle.value;
-                article.category = articleCategory.value;
-                article.content = articleContent.value;
-                saveArticles();
-                articleModal.style.display = "none";
-                renderArticles(filterCategory.value, searchInput.value);
+                fetch(`${API_BASE}/articles/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        title: articleTitle.value,
+                        category: articleCategory.value,
+                        content: articleContent.value
+                    })
+                })
+                    .then(res => res.json())
+                    .then(() => {
+                        articleModal.style.display = "none";
+                        fetchArticles();
+                    });
             };
         }
     }
 
     function deleteArticle(id) {
         if (!confirm("هل أنت متأكد من أنك تريد حذف هذا المقال؟")) return;
-        articles = articles.filter(a => a.id !== id);
-        saveArticles();
-        renderArticles(filterCategory.value, searchInput.value);
+        fetch(`${API_BASE}/articles/${id}`, {
+            method: "DELETE"
+        })
+            .then(res => res.json())
+            .then(() => fetchArticles());
     }
 
     function validateInput(title, category, content) {
@@ -143,13 +183,35 @@ document.addEventListener("DOMContentLoaded", function () {
         articleCategory.value = "";
         articleContent.value = "";
         articleModal.style.display = "block";
+
+        articleForm.onsubmit = function (event) {
+            event.preventDefault();
+            if (!validateInput(articleTitle.value, articleCategory.value, articleContent.value)) return;
+            fetch(`${API_BASE}/articles`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify({
+                    title: articleTitle.value,
+                    category: articleCategory.value,
+                    content: articleContent.value
+                })
+            })
+                .then(res => res.json())
+                .then(() => {
+                    articleModal.style.display = "none";
+                    fetchArticles();
+                });
+        };
     });
 
     closeModal.addEventListener("click", function () {
         articleModal.style.display = "none";
     });
 
-    cancelModal.addEventListener("click", function () {
+    cancelModal?.addEventListener("click", function () {
         articleModal.style.display = "none";
     });
 
@@ -159,21 +221,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    articleForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        if (!validateInput(articleTitle.value, articleCategory.value, articleContent.value)) return;
-        addArticle(articleTitle.value, articleCategory.value, articleContent.value);
-        articleModal.style.display = "none";
-    });
-
     filterCategory.addEventListener("change", function () {
         renderArticles(filterCategory.value, searchInput.value);
     });
 
-    searchButton.addEventListener("click", function () {
+    searchButton?.addEventListener("click", function () {
         renderArticles(filterCategory.value, searchInput.value);
     });
 
-    renderArticles();
+    fetchArticles();
     fetchSuggestions();
 });

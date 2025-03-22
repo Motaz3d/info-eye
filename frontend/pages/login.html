@@ -1,3 +1,4 @@
+<!-- ✅ login.html -->
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -5,24 +6,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>تسجيل الدخول</title>
   <link rel="stylesheet" href="../css/styles.css" />
-  <!-- خط عربي من Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <main>
+  <main style="max-width: 400px; margin: auto; padding: 20px;">
     <h2>تسجيل الدخول</h2>
     <form id="loginForm">
-      <label for="username">اسم المستخدم:</label>
+      <label>اسم المستخدم:</label>
       <input type="text" id="username" required />
 
-      <label for="password">كلمة المرور:</label>
+      <label>كلمة المرور:</label>
       <input type="password" id="password" required />
 
       <button type="submit">دخول</button>
     </form>
-    <p id="loginMessage"></p>
+    <p>ليس لديك حساب؟ <a href="register.html">إنشاء حساب جديد</a></p>
   </main>
+  <script>
+    const API_BASE = "https://info-eye.onrender.com";
 
-  <script src="../js/login.js"></script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+            window.location.href = "admin.html";
+          } else {
+            alert(data.message || "فشل تسجيل الدخول");
+          }
+        })
+        .catch(() => alert("❌ خطأ في الاتصال بالخادم"));
+    });
+  </script>
+</body>
+</html>
+
+<!-- ✅ register.html -->
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>إنشاء حساب</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <main style="max-width: 400px; margin: auto; padding: 20px;">
+    <h2>إنشاء حساب جديد</h2>
+    <form id="registerForm">
+      <label>اسم المستخدم:</label>
+      <input type="text" id="username" required />
+
+      <label>كلمة المرور:</label>
+      <input type="password" id="password" required />
+
+      <button type="submit">تسجيل</button>
+    </form>
+    <p>هل لديك حساب؟ <a href="login.html">تسجيل الدخول</a></p>
+  </main>
+  <script>
+    const API_BASE = "https://info-eye.onrender.com";
+
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  fetch(`${API_BASE}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  })
+    .then(res => {
+      if (!res.ok) {
+        return res.json().then(data => { throw new Error(data.message || "فشل في إنشاء الحساب"); });
+      }
+      return res.json();
+    })
+    .then(data => {
+      alert(data.message);
+      window.location.href = "login.html";
+    })
+    .catch(err => alert("❌ " + err.message));
+});
+  </script>
 </body>
 </html>

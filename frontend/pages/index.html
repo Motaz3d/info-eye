@@ -3,22 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>عين المعلومات - الصفحة الرئيسية</title>
+  <title>عين المعلومات - منصة عربية للتحليل</title>
+  <meta name="description" content="عين المعلومات: منصة عربية للتحليل المبسط في مجالات الصناعة، التسويق، الزراعة، وأكثر.">
 
-  <!-- الأيقونات -->
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <!-- Open Graph Tags -->
+  <meta property="og:title" content="عين المعلومات - منصة عربية للتحليل">
+  <meta property="og:description" content="منصة عربية تعرض محتوى تحليلي مبسط وحديث في مختلف المجالات.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://info-eye-frontend.onrender.com">
+  <meta property="og:image" content="../assets/og-image.png">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="عين المعلومات">
+  <meta name="twitter:description" content="تحليل عربي مبسط وحديث للصناعة والتسويق والزراعة.">
+  <meta name="twitter:image" content="../assets/og-image.png">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16x16.png">
   <link rel="manifest" href="../assets/site.webmanifest">
 
   <!-- ستايل -->
-  <link rel="stylesheet" href="css/styles.css" />
-  <!-- خط عربي من Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
     <h1>عين المعلومات</h1>
+    <p style="font-size: 1.2em; color: #666; margin-top: -10px;">منصة عربية مبسطة للتحليل في الصناعة والتسويق والزراعة</p>
     <button id="darkModeToggle">تبديل الوضع الليلي</button>
   </header>
 
@@ -27,40 +41,43 @@
       <li><a href="index.html">الرئيسية</a></li>
       <li><a href="categories.html">التصنيفات</a></li>
       <li><a href="favorites.html">📌 المفضلة</a></li>
-      <li><a href="admin.html">لوحة التحكم</a></li>
+      <li><a href="about.html">من نحن</a></li>
+      <li><a href="contact.html">اتصل بنا</a></li>
     </ul>
   </nav>
 
   <main>
-    <h2>أحدث المقالات</h2>
-  
-    <!-- روابط التصنيفات السريعة -->
+    <h2>🆕 أحدث المقالات</h2>
+
     <section id="quick-categories" style="margin-bottom: 20px;">
       <h3>🔍 تصفح حسب التصنيف:</h3>
-      <ul style="list-style: none; padding: 0;">
+      <ul style="list-style: none; padding: 0; display: flex; gap: 15px;">
         <li><a href="categories.html?category=Industry">🏭 الصناعة</a></li>
         <li><a href="categories.html?category=Marketing">📈 التسويق</a></li>
         <li><a href="categories.html?category=Agriculture">🌾 الزراعة</a></li>
       </ul>
     </section>
-  
+
     <!-- حقل البحث -->
     <input
       type="text"
       id="searchInput"
       placeholder="ابحث عن مقال..."
-      style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px;"
+      style="width: 100%; padding: 10px; margin-bottom: 20px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px;"
     />
-  
+
     <div id="articlesContainer">
       <!-- سيتم تحميل المقالات هنا ديناميكيًا -->
     </div>
-  
-    <button id="loadMore" style="display: none;">تحميل المزيد</button>
+
+    <button id="loadMore" style="display: none; margin-top: 20px;">تحميل المزيد</button>
   </main>
 
-  <!-- سكريبتات -->
+  <footer style="text-align: center; padding: 20px; margin-top: 40px; font-size: 14px; background: #f5f5f5;">
+    <p>© 2025 عين المعلومات. جميع الحقوق محفوظة.</p>
+  </footer>
+
   <script src="../js/darkmode.js"></script>
-  <script src="js/index.js"></script>
+  <script src="../js/index.js"></script>
 </body>
 </html>
