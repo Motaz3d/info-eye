@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
     // ✅ جلب المقالات من السيرفر
     function fetchArticlesFromServer() {
-      fetch("http://localhost:3000/articles")
+      fetch("https://info-eye.onrender.com/articles")
         .then(res => res.json())
         .then(data => {
           allArticles = data;
