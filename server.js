@@ -12,21 +12,18 @@ const SECRET_KEY = process.env.JWT_SECRET || "supersecretkey";
 app.use(cors());
 app.use(express.json());
 
-// الاتصال بقاعدة البيانات MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => console.log("✅ Connected to MongoDB"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// نموذج المستخدم
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true }
 });
 const User = mongoose.model("User", UserSchema);
 
-// نموذج المقالات
 const ArticleSchema = new mongoose.Schema({
   title: String,
   category: String,
@@ -52,7 +49,6 @@ const Suggestion = mongoose.model("Suggestion", new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 }));
 
-// تسجيل مستخدم جديد
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
     if (await User.findOne({ username })) {
@@ -64,7 +60,6 @@ app.post("/register", async (req, res) => {
     res.status(201).json({ message: "تم إنشاء الحساب بنجاح" });
 });
 
-// تسجيل الدخول وإرجاع توكن JWT
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
@@ -75,7 +70,6 @@ app.post("/login", async (req, res) => {
     res.json({ token });
 });
 
-// التحقق من صحة التوكن
 function authenticateToken(req, res, next) {
     const token = req.headers["authorization"];
     if (!token) return res.status(403).json({ message: "مطلوب تسجيل الدخول" });
@@ -86,13 +80,11 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// نقطة نهاية لجلب جميع المقالات
 app.get("/articles", async (req, res) => {
     const articles = await Article.find().sort({ createdAt: -1 });
     res.json(articles);
 });
 
-// نقطة نهاية لإضافة مقال جديد (محمي بالتوكن)
 app.post("/articles", authenticateToken, async (req, res) => {
     const { title, category, content } = req.body;
     const newArticle = new Article({ title, category, content, author: req.user.username });
@@ -100,7 +92,6 @@ app.post("/articles", authenticateToken, async (req, res) => {
     res.status(201).json(newArticle);
 });
 
-// نقطة نهاية لجلب مقال حسب ID
 app.get("/articles/:id", async (req, res) => {
     try {
         const article = await Article.findById(req.params.id);
@@ -111,21 +102,41 @@ app.get("/articles/:id", async (req, res) => {
     }
 });
 
-// نقطة نهاية لتقييم المقال
+app.put("/articles/:id", authenticateToken, async (req, res) => {
+    try {
+        const updated = await Article.findByIdAndUpdate(
+            req.params.id,
+            { $set: req.body },
+            { new: true }
+        );
+        if (!updated) return res.status(404).json({ message: "❌ لم يتم العثور على المقال لتعديله" });
+        res.json(updated);
+    } catch (error) {
+        res.status(500).json({ message: "❌ خطأ في تعديل المقال" });
+    }
+});
+
+app.delete("/articles/:id", authenticateToken, async (req, res) => {
+    try {
+        const deleted = await Article.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ message: "❌ لم يتم العثور على المقال لحذفه" });
+        res.json({ message: "✅ تم حذف المقال بنجاح" });
+    } catch (error) {
+        res.status(500).json({ message: "❌ خطأ في حذف المقال" });
+    }
+});
+
 app.post("/articles/:id/rate", async (req, res) => {
     const { rating } = req.body;
     if (rating < 1 || rating > 5) {
         return res.status(400).json({ message: "⚠️ التقييم غير صالح" });
     }
-
     try {
         const article = await Article.findById(req.params.id);
         if (!article) return res.status(404).json({ message: "❌ لم يتم العثور على المقال" });
-
         const totalRating = article.rating * article.ratingCount;
         article.ratingCount += 1;
         article.rating = (totalRating + rating) / article.ratingCount;
-
         await article.save();
         res.json({ message: "✅ تم حفظ تقييمك بنجاح" });
     } catch (err) {
@@ -133,7 +144,6 @@ app.post("/articles/:id/rate", async (req, res) => {
     }
 });
 
-// نقطة نهاية لجلب الاقتراحات المخزنة
 app.get("/suggestions", async (req, res) => {
     try {
         const suggestions = await Suggestion.find().sort({ createdAt: -1 });
@@ -143,16 +153,10 @@ app.get("/suggestions", async (req, res) => {
     }
 });
 
-// نقطة تحليل إحصائيات المقالات حسب التصنيف
 app.get("/stats/articles", async (req, res) => {
     try {
         const stats = await Article.aggregate([
-            {
-                $group: {
-                    _id: "$category",
-                    count: { $sum: 1 }
-                }
-            },
+            { $group: { _id: "$category", count: { $sum: 1 } } },
             { $sort: { count: -1 } }
         ]);
         res.json(stats);
@@ -161,7 +165,6 @@ app.get("/stats/articles", async (req, res) => {
     }
 });
 
-// نقطة تحليل المقالات حسب الأشهر
 app.get("/stats/monthly", async (req, res) => {
     try {
         const monthlyStats = await Article.aggregate([
@@ -182,55 +185,45 @@ app.get("/stats/monthly", async (req, res) => {
     }
 });
 
-// ✅ نقطة نهاية لجلب التعليقات
 app.get("/articles/:id/comments", async (req, res) => {
     try {
-      const article = await Article.findById(req.params.id);
-      if (!article) return res.status(404).json({ message: "❌ لم يتم العثور على المقال" });
-      res.json(article.comments || []);
+        const article = await Article.findById(req.params.id);
+        if (!article) return res.status(404).json({ message: "❌ لم يتم العثور على المقال" });
+        res.json(article.comments || []);
     } catch (error) {
-      res.status(500).json({ message: "❌ خطأ في جلب التعليقات" });
+        res.status(500).json({ message: "❌ خطأ في جلب التعليقات" });
     }
 });
 
-// ✅ نقطة نهاية لإضافة تعليق
 app.post("/articles/:id/comments", async (req, res) => {
     const { author, text, commentId } = req.body;
-
     if (!author || !text || !commentId) {
-      return res.status(400).json({ message: "❌ الاسم والنص ومعرف التعليق مطلوبون" });
+        return res.status(400).json({ message: "❌ الاسم والنص ومعرف التعليق مطلوبون" });
     }
-
     try {
-      const article = await Article.findById(req.params.id);
-      if (!article) return res.status(404).json({ message: "❌ لم يتم العثور على المقال" });
-
-      article.comments.push({ commentId, author, text });
-      await article.save();
-
-      res.json({ message: "✅ تم إضافة التعليق بنجاح" });
+        const article = await Article.findById(req.params.id);
+        if (!article) return res.status(404).json({ message: "❌ لم يتم العثور على المقال" });
+        article.comments.push({ commentId, author, text });
+        await article.save();
+        res.json({ message: "✅ تم إضافة التعليق بنجاح" });
     } catch (error) {
-      res.status(500).json({ message: "❌ خطأ أثناء حفظ التعليق" });
+        res.status(500).json({ message: "❌ خطأ أثناء حفظ التعليق" });
     }
 });
 
-// ✅ نقطة نهاية لحذف تعليق
 app.delete("/articles/:id/comments/:commentId", async (req, res) => {
     try {
-      const { id, commentId } = req.params;
-      const article = await Article.findById(id);
-      if (!article) return res.status(404).json({ message: "❌ المقال غير موجود" });
-
-      article.comments = article.comments.filter(comment => comment.commentId !== commentId);
-      await article.save();
-
-      res.json({ message: "✅ تم حذف التعليق بنجاح" });
+        const { id, commentId } = req.params;
+        const article = await Article.findById(id);
+        if (!article) return res.status(404).json({ message: "❌ المقال غير موجود" });
+        article.comments = article.comments.filter(comment => comment.commentId !== commentId);
+        await article.save();
+        res.json({ message: "✅ تم حذف التعليق بنجاح" });
     } catch (error) {
-      res.status(500).json({ message: "❌ فشل في حذف التعليق" });
+        res.status(500).json({ message: "❌ فشل في حذف التعليق" });
     }
 });
 
-// تشغيل الخادم
 app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
 });
